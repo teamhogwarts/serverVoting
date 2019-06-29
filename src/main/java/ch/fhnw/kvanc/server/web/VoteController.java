@@ -1,6 +1,7 @@
 package ch.fhnw.kvanc.server.web;
 
 import ch.fhnw.kvanc.server.domain.Vote;
+import ch.fhnw.kvanc.server.integration.MQTTClient;
 import ch.fhnw.kvanc.server.repository.VoteRepository;
 import ch.fhnw.kvanc.server.service.AuthorizationService;
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ public class VoteController {
 
     @Autowired
     VoteRepository voteRepository;
+
+    @Autowired
+    private MQTTClient mqttClient;
 
     @GetMapping
     public ResponseEntity<String> sayHello() {
@@ -83,6 +87,7 @@ public class VoteController {
         }
         vote.setTrue(dto.getVote());
         voteRepository.updateVote(vote);
+        mqttClient.publish(voteRepository.findAll());
         logger.debug("Vote updated for '" + vote.getEmail() + "'");
         return new ResponseEntity<Void>(HttpStatus.OK);
     }

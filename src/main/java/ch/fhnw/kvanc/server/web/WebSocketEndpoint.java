@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PingMessage;
+import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -52,6 +53,12 @@ public class WebSocketEndpoint extends TextWebSocketHandler {
         }
     }
 
+    @Override
+    protected void handlePongMessage(WebSocketSession session, PongMessage message) throws Exception {
+        log.debug("Pong received from session " + session.getId());
+    }
+
+    // 30 sec following IETF recommendation: see http://tools.ietf.org/html/rfc6202
     @Scheduled(fixedRate = 30000)
     public void sendPing() throws IOException {
         if (!sessions.isEmpty()) {
@@ -64,4 +71,5 @@ public class WebSocketEndpoint extends TextWebSocketHandler {
             log.debug("No session available");
         }
     }
+
 }
